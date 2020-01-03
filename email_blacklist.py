@@ -7,6 +7,7 @@ import boto3
 EMAIL_FROM = os.getenv('EMAIL_FROM', '')
 EMAIL_TO = os.getenv('EMAIL_TO', '').split(';')
 SES_REGION = os.getenv('SES_REGION', 'us-east-1')
+DYNAMODB_TABLE = os.getenv('DYNAMODB_TABLE', '')
 
 dynamodb = boto3.client('dynamodb')
 
@@ -56,7 +57,7 @@ def lambda_handler(event, context):
                                 'S': email,
                             },
                         },
-                        TableName='ses_blacklist',
+                        TableName=DYNAMODB_TABLE,
                     )
                     print(f'{email} is a bounced email recipient, blacklisting')
             elif sns_message['notificationType'] == 'Bounce' and sns_message['bounce']['bounceType'] == 'Transient':

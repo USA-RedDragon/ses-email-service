@@ -1,7 +1,5 @@
 # SES Email Service
 
-[![CircleCI](https://circleci.com/gh/clevyr/ses-email-service/tree/master.svg?style=svg&circle-token=389fb235ee13f70fc317d44f8c074532dd65baca)](https://circleci.com/gh/clevyr/ses-email-service/tree/master)
-
 This service is used to help with clients who need a large amount of emails sent via SES and need to deal with rate limiting.
 
 There are two services within this repo, the SES Email Service to be run as a Docker container, and the Email Blacklist service that runs in Lambda and listens to SNS for email bounce or complaint notifications, and adds them to a global blacklist.
@@ -14,7 +12,7 @@ The email service docker will update `:latest` on a push to the master branch, a
 
 |  Environment Variable   |                                                                       Details                                                                       |                     Example                     |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `USE_BLACKLIST`         | Whether to use the Clevyr email recipient blacklist                                                                                                 | `true`                                          |
+| `USE_BLACKLIST`         | Whether to use the Liquidfish email recipient blacklist                                                                                                 | `true`                                          |
 | `AWS_ACCESS_KEY_ID`     | Specifies an AWS access key associated with an IAM user or role, used to access the shared blacklist                                                | `AKIA0000000000000000`                          |
 | `AWS_SECRET_ACCESS_KEY` | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. Used to access the shared blacklist | `0000000000000000000000000000000000000`         |
 | `AWS_DEFAULT_REGION`    | Specifies the AWS Region to send the request to. Used to access the shared blacklist                                                                | `us-east-1`                                     |
