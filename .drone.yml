@@ -45,7 +45,7 @@ steps:
       from_secret: DOCKER_HUB_PASSWORD
 
 - name: Deploy
-  image: bitnami/kubectl
+  image: bitnami/kubectl:1.15
   commands:
   - kubectl -n global set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
 

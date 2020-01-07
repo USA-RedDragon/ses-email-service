@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ses-email-service-deployment
+  namespace: global
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ses-email-service
+  template:
+    metadata:
+      labels:
+        app: ses-email-service
+    spec:
+      containers:
+      - name: ses-email-service
+        image: liquidfish/ses-email-service:1.0.0
+        env:
+        - name: USE_BLACKLIST
+          value: "true"
+        - name: DEBUG
+          value: "true"
+        - name: AWS_DEFAULT_REGION
+          value: us-east-1
+        - name: SES_RATE_LIMIT
+          value: "14"
+        - name: AWS_SMTP_HOST
+          value: "email-smtp.us-east-1.amazonaws.com"
+        - name: AWS_SMTP_PORT
+          value: "587"
+        - name: DYNAMODB_TABLE
+          value: email-blacklist
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: ses-email-service
+              key: aws-access-key-id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: ses-email-service
+              key: aws-secret-access-key
+        - name: AWS_SMTP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ses-email-service
+              key: aws-smtp-username
+        - name: AWS_SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ses-email-service
+              key: aws-smtp-password
+        ports:
+        - containerPort: 1025

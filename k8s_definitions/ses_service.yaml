@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ses-email-service
+  namespace: global
+spec:
+  selector:
+    app: ses-email-service
+  ports:
+    - protocol: TCP
+      port: 1025
+      targetPort: 1025
+  type: LoadBalancer
