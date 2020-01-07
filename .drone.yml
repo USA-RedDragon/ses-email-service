@@ -1,12 +1,21 @@
 kind: pipeline
 type: kubernetes
-name: default
+name: ses-email-service
 
 steps:
-- name: Test
+- name: Deploye Lambda
   image: clevyr/circleci-ecr-builder
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: AWS_ACCESS_KEY_ID
+    AWS_DEFAULT_REGION:
+      from_secret: AWS_DEFAULT_REGION
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: AWS_SECRET_ACCESS_KEY
   commands:
-  - pwd
+  - zip ./email-blacklist.zip email_blacklist.py
+  - aws lambda update-function-code --function-name EmailBlacklist --zip-file fileb://./email-blacklist.zip
+  - echo "Publishing Lambda version $(aws lambda publish-version --function-name EmailBlacklist | jq -r .Version)"
 
 trigger:
   branch:
