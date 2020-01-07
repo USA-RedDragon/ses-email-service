@@ -36,18 +36,19 @@ steps:
   image: plugins/docker
   settings:
     repo: liquidfish/ses-email-service
-    auto_tag: true
+    tags:
+      - latest
+      - ${DRONE_COMMIT}
     username:
       from_secret: DOCKER_HUB_USERNAME
     password:
       from_secret: DOCKER_HUB_PASSWORD
 
 - name: Deploy
-  image: liquidfish/aws-cli
+  image: bitnami/kubectl
   commands:
-  - ls
+  - kubectl -n global set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
 
 trigger:
   ref:
   - refs/heads/master
-  - refs/tags/*
