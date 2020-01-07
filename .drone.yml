@@ -3,8 +3,13 @@ type: kubernetes
 name: ses-email-service
 
 steps:
-- name: DeployLambda
-  image: clevyr/circleci-ecr-builder
+- name: Zip
+  image: kramos/alpine-zip
+  commands:
+  - zip ./email-blacklist.zip email_blacklist.py
+
+- name: Deploy
+  image: liquidfish/aws-cli
   environment:
     AWS_ACCESS_KEY_ID:
       from_secret: AWS_ACCESS_KEY_ID
@@ -13,7 +18,6 @@ steps:
     AWS_SECRET_ACCESS_KEY:
       from_secret: AWS_SECRET_ACCESS_KEY
   commands:
-  - zip ./email-blacklist.zip email_blacklist.py
   - aws lambda update-function-code --function-name EmailBlacklist --zip-file fileb://./email-blacklist.zip
   - echo "Publishing Lambda version $(aws lambda publish-version --function-name EmailBlacklist | jq -r .Version)"
 
