@@ -19,6 +19,8 @@ _DEFAULT_CIPHERS = (
 
 SES_RATE_LIMIT = int(os.getenv('SES_RATE_LIMIT', '10'))
 
+DYNAMODB_TABLE = os.getenv('DYNAMODB_TABLE', '')
+
 SMTP_HOST = os.getenv('SMTP_HOST', '0.0.0.0')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
 
@@ -115,7 +117,7 @@ def removeBlacklist(email_addresses):
                         'S': email,
                     },
                 },
-                TableName='ses_blacklist',
+                TableName=DYNAMODB_TABLE,
             )
             if 'Item' in item.keys():
                 print(

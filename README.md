@@ -15,11 +15,13 @@ The email service docker will update `:latest` on a push to the master branch, a
 
 |  Environment Variable   |                                                                       Details                                                                       |                     Example                     |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `USE_BLACKLIST`         | Whether to use the Liquidfish email recipient blacklist                                                                                                 | `true`                                          |
+| `DEBUG`                 | Whether to log verbosely                                                                                                                            | `true`                                          |
+| `USE_BLACKLIST`         | Whether to use the Liquidfish email recipient blacklist                                                                                             | `true`                                          |
 | `AWS_ACCESS_KEY_ID`     | Specifies an AWS access key associated with an IAM user or role, used to access the shared blacklist                                                | `AKIA0000000000000000`                          |
 | `AWS_SECRET_ACCESS_KEY` | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. Used to access the shared blacklist | `0000000000000000000000000000000000000`         |
 | `AWS_DEFAULT_REGION`    | Specifies the AWS Region to send the request to. Used to access the shared blacklist                                                                | `us-east-1`                                     |
 | `SES_RATE_LIMIT`        | Specifies the maximum emails per second you are allowed to send per second                                                                          | `10`                                            |
+| `DYNAMODB_TABLE`        | DynamoDB table with the blacklist                                                                                                                   | `ses-blacklist`                                 |
 | `SMTP_HOST`             | Specifies the host to listen on                                                                                                                     | `0.0.0.0`                                       |
 | `SMTP_PORT`             | Specifies the port to listen on                                                                                                                     | `1025`                                          |
 | `AWS_SMTP_HOST`         | Specifies the AWS SES SMTP host to talk to                                                                                                          | `email-smtp.us-east-1.amazonaws.com`            |
@@ -34,6 +36,7 @@ The email service docker will update `:latest` on a push to the master branch, a
 | `SES_REGION`         | The region that SES is working in                               | `us-east-1`                        |
 | `EMAIL_FROM`         | The email address to send emails from                           | `backups@domain.com`               |
 | `EMAIL_TO`           | The list of email addresses to send to, separated by semicolons | `user@domain.com;user1@domain.com` |
+| `DYNAMODB_TABLE`     | DynamoDB table with the blacklist                               | `ses-blacklist`                    |
 
 ## IAM Roles
 
