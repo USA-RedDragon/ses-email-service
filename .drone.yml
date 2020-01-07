@@ -3,7 +3,7 @@ type: kubernetes
 name: ses-email-service
 
 steps:
-- name: Deploye Lambda
+- name: DeployLambda
   image: clevyr/circleci-ecr-builder
   environment:
     AWS_ACCESS_KEY_ID:
