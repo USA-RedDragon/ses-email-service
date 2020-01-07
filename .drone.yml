@@ -1,6 +1,6 @@
 kind: pipeline
 type: kubernetes
-name: ses-email-service
+name: ses-email-service-lambda
 
 steps:
 - name: Zip
@@ -20,6 +20,34 @@ steps:
   commands:
   - aws lambda update-function-code --function-name EmailBlacklist --zip-file fileb://./email-blacklist.zip
   - echo "Publishing Lambda version $(aws lambda publish-version --function-name EmailBlacklist | jq -r .Version)"
+
+trigger:
+  branch:
+  - master
+
+---
+
+kind: pipeline
+type: kubernetes
+name: ses-email-service
+
+steps:
+- name: Build
+  image: docker:stable
+  environment:
+    DOCKER_HUB_USERNAME:
+      from_secret: DOCKER_HUB_USERNAME
+    DOCKER_HUB_PASSWORD:
+      from_secret: DOCKER_HUB_PASSWORD
+  commands:
+  - docker build -t liquidfish/ses-email-service:latest .
+  - docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}
+  - docker push liquidfish/ses-email-service:latest
+
+- name: Deploy
+  image: liquidfish/aws-cli
+  commands:
+  - ls
 
 trigger:
   branch:
