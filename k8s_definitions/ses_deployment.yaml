@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ses-email-service
-        image: liquidfish/ses-email-service:1.0.0
+        image: liquidfish/ses-email-service:latest
         env:
         - name: USE_BLACKLIST
           value: "true"
