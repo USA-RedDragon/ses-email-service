@@ -33,16 +33,14 @@ name: ses-email-service
 
 steps:
 - name: Build
-  image: docker:stable
-  environment:
-    DOCKER_HUB_USERNAME:
+  image: plugins/docker
+  settings:
+    repo: liquidfish/ses-email-service
+    auto_tag: true
+    username:
       from_secret: DOCKER_HUB_USERNAME
-    DOCKER_HUB_PASSWORD:
+    password:
       from_secret: DOCKER_HUB_PASSWORD
-  commands:
-  - docker build -t liquidfish/ses-email-service:latest .
-  - docker login -u ${DOCKER_HUB_USERNAME} -p ${DOCKER_HUB_PASSWORD}
-  - docker push liquidfish/ses-email-service:latest
 
 - name: Deploy
   image: liquidfish/aws-cli
@@ -50,5 +48,6 @@ steps:
   - ls
 
 trigger:
-  branch:
-  - master
+  ref:
+  - refs/heads/master
+  - refs/tags/*
