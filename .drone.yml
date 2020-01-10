@@ -84,8 +84,7 @@ steps:
 
 
       {{ build.link }}
-
-when:
-  status:
-  - success
-  - failure
+  when:
+    status:
+    - success
+    - failure
