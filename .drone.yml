@@ -64,7 +64,7 @@ clone:
 
 steps:
 - name: notify
-  image: appleboy/drone-discored
+  image: appleboy/drone-discord
   settings:
     webhook_id:
       from_secret: DISCORD_WEBHOOK_ID
