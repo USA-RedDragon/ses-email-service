@@ -59,6 +59,9 @@ kind: pipeline
 type: kubernetes
 name: discord-webhook
 
+clone:
+  disable: true
+
 steps:
 - name: notify
   image: appleboy/drone-discored
