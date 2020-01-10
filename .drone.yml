@@ -62,12 +62,12 @@ name: discord-webhook
 steps:
 - name: discord notification
   image: appleboy/drone-discored
-  username: LiquidCI
   settings:
     webhook_id:
-       from_secret: DISCORD_WEBHOOK_ID
-     webhook_token:
-       from_secret: DISCORD_WEBHOOK_SECRET
+      from_secret: DISCORD_WEBHOOK_ID
+    webhook_token:
+      from_secret: DISCORD_WEBHOOK_SECRET
+    username: LiquidCI
     message: >
       {{#success build.status}}
         build {{build.number}} succeeded.
