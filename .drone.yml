@@ -52,3 +52,30 @@ steps:
 trigger:
   ref:
   - refs/heads/master
+
+---
+
+kind: pipeline
+type: kubernetes
+name: discord-webhook
+
+steps:
+- name: discord notification
+  image: appleboy/drone-discored
+  username: LiquidCI
+  settings:
+    webhook_id:
+       from_secret: DISCORD_WEBHOOK_ID
+     webhook_token:
+       from_secret: DISCORD_WEBHOOK_SECRET
+    message: >
+      {{#success build.status}}
+        build {{build.number}} succeeded.
+      {{else}}
+        build {{build.number}} failed.
+      {{/success}}
+
+when:
+  status:
+  - success
+  - failure
