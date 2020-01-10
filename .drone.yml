@@ -70,6 +70,8 @@ steps:
     username: LiquidCI
     message: >
       **{{#success build.status}}:white_check_mark:{{ else }}:x:{{/success}} {{ uppercasefirst build.status }}: Build #{{ build.number }}**
+
+
       {{#if build.pull }}
         Pull Request: #{{ build.pull }} https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/pull-requests/{{ build.pull }}
       {{/if}}
@@ -79,6 +81,7 @@ steps:
       Branch: {{ build.branch }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}
 
       Author: {{ build.author }}
+
 
       {{ build.link }}
 
