@@ -49,17 +49,6 @@ steps:
   commands:
   - kubectl -n global set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
 
-trigger:
-  ref:
-  - refs/heads/master
-
----
-
-kind: pipeline
-type: kubernetes
-name: discord-webhook
-
-steps:
 - name: notify
   image: appleboy/drone-discord
   settings:
@@ -88,3 +77,8 @@ steps:
     status:
     - success
     - failure
+
+trigger:
+  ref:
+  - refs/heads/master
+
