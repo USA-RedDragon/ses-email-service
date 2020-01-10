@@ -60,7 +60,7 @@ type: kubernetes
 name: discord-webhook
 
 steps:
-- name: discord notification
+- name: notify
   image: appleboy/drone-discored
   settings:
     webhook_id:
