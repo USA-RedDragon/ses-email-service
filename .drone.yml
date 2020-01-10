@@ -59,9 +59,6 @@ kind: pipeline
 type: kubernetes
 name: discord-webhook
 
-clone:
-  disable: true
-
 steps:
 - name: notify
   image: appleboy/drone-discord
@@ -76,9 +73,13 @@ steps:
       {{#if build.pull }}
         Pull Request: #{{ build.pull }} https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/pull-requests/{{ build.pull }}
       {{/if}}
+
       Commit: {{ build.commit }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.commit }}
+
       Branch: {{ build.branch }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}
+
       Author: {{ build.author }}
+
       {{ build.link }}
 
 when:
