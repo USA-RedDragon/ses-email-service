@@ -1,5 +1,5 @@
 kind: pipeline
-type: kubernetes
+type: docker
 name: ses-email-service-lambda
 
 steps:
@@ -28,7 +28,7 @@ trigger:
 ---
 
 kind: pipeline
-type: kubernetes
+type: docker
 name: ses-email-service
 
 steps:
@@ -73,10 +73,6 @@ steps:
 
 
       {{ build.link }}
-  when:
-    status:
-    - success
-    - failure
 
 trigger:
   ref:
