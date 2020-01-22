@@ -13,20 +13,26 @@ The email service docker will update `:latest` on a push to the master branch, a
 
 ## Service Environment Variables
 
-|  Environment Variable   |                                                                       Details                                                                       |                     Example                     |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `USE_BLACKLIST`         | Whether to use the Liquidfish email recipient blacklist                                                                                             | `true`                                          |
-| `AWS_ACCESS_KEY_ID`     | Specifies an AWS access key associated with an IAM user or role, used to access the shared blacklist                                                | `AKIA0000000000000000`                          |
-| `AWS_SECRET_ACCESS_KEY` | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. Used to access the shared blacklist | `0000000000000000000000000000000000000`         |
-| `AWS_DEFAULT_REGION`    | Specifies the AWS Region to send the request to. Used to access the shared blacklist                                                                | `us-east-1`                                     |
-| `SES_RATE_LIMIT`        | Specifies the maximum emails per second you are allowed to send per second                                                                          | `10`                                            |
-| `DYNAMODB_TABLE`        | DynamoDB table with the blacklist                                                                                                                   | `ses-blacklist`                                 |
-| `SMTP_HOST`             | Specifies the host to listen on                                                                                                                     | `0.0.0.0`                                       |
-| `SMTP_PORT`             | Specifies the port to listen on                                                                                                                     | `1025`                                          |
-| `AWS_SMTP_HOST`         | Specifies the AWS SES SMTP host to talk to                                                                                                          | `email-smtp.us-east-1.amazonaws.com`            |
-| `AWS_SMTP_PORT`         | Specifies the AWS SES SMTP port to talk to                                                                                                          | `587`                                           |
-| `AWS_SMTP_USERNAME`     | Specifies the AWS SES SMTP username                                                                                                                 | `AKIA0000000000000000`                          |
-| `AWS_SMTP_PASSWORD`     | Specifies the AWS SES SMTP username                                                                                                                 | `ABCDEF/GHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQR` |
+|   Environment Variable    |                                                                       Details                                                                       |                     Example                     |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `USE_BLACKLIST`           | Whether to use the email recipient blacklist                                                                                                        | `true`                                          |
+| `USE_APIKEY`              | Whether to use the api key auth system                                                                                                              | `true`                                          |
+| `AWS_ACCESS_KEY_ID`       | Specifies an AWS access key associated with an IAM user or role, used to access the shared blacklist                                                | `AKIA0000000000000000`                          |
+| `AWS_SECRET_ACCESS_KEY`   | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. Used to access the shared blacklist | `0000000000000000000000000000000000000`         |
+| `AWS_DEFAULT_REGION`      | Specifies the AWS Region to send the request to. Used to access the shared blacklist                                                                | `us-east-1`                                     |
+| `SES_RATE_LIMIT`          | Specifies the maximum emails per second you are allowed to send per second                                                                          | `10`                                            |
+| `DYNAMODB_TABLE`          | DynamoDB table with the blacklist                                                                                                                   | `ses-blacklist`                                 |
+| `DYNAMODB_API_KEYS_TABLE` | DynamoDB table with api keys                                                                                                                        | `ses-api-keys`                                  |
+| `SMTP_HOST`               | Specifies the host to listen on                                                                                                                     | `0.0.0.0`                                       |
+| `SMTP_PORT`               | Specifies the port to listen on                                                                                                                     | `1025`                                          |
+| `AWS_SMTP_HOST`           | Specifies the AWS SES SMTP host to talk to                                                                                                          | `email-smtp.us-east-1.amazonaws.com`            |
+| `AWS_SMTP_PORT`           | Specifies the AWS SES SMTP port to talk to                                                                                                          | `587`                                           |
+| `AWS_SMTP_USERNAME`       | Specifies the AWS SES SMTP username                                                                                                                 | `AKIA0000000000000000`                          |
+| `AWS_SMTP_PASSWORD`       | Specifies the AWS SES SMTP username                                                                                                                 | `ABCDEF/GHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQR` |
+| `SERVER_FQDN`             | Specifies server domain name, for certificate verification                                                                                          | `email.example.com`                             |
+| `ENABLE_SSL`              | Whether to use ssl                                                                                                                                  | `true`                                          |
+| `SSL_CERT_PATH`           | Specifies the SSL certificate path                                                                                                                  | `/ssl/tls.crt`                                  |
+| `SSL_KEY_PATH`            | Specifies the SSL private key path                                                                                                                  | `/ssl/tls.key`                                  |
 
 ## Lambda Environment Variables
 
@@ -112,7 +118,7 @@ Here are the permissions required to run the Email Blacklist Lambda
 
 ### Email Blacklist DynamoDB Access
 
-Here are the permissions required to access the Email Blacklist from the SES Service (BLACKLIST_AWS_ACCESS_KEY_ID and adjacent environment variables)
+Here are the permissions required to access the Email Blacklist from the SES Service (AWS_ACCESS_KEY_ID and adjacent environment variables)
 
 #### Email Blacklist DynamoDB Policy
 
@@ -124,7 +130,10 @@ Here are the permissions required to access the Email Blacklist from the SES Ser
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "dynamodb:GetItem",
-            "Resource": "arn:aws:dynamodb:<REGION>:<ACCOUNT_ID>:table/<TABLE_NAME>"
+            "Resource": [
+                "arn:aws:dynamodb:<REGION>:<ACCOUNT_ID>:table/<BLACKLIST_TABLE_NAME>",
+                "arn:aws:dynamodb:<REGION>:<ACCOUNT_ID>:table/<API_KEY_TABLE_NAME>"
+            ]
         }
     ]
 }
