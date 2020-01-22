@@ -1,5 +1,5 @@
 .git/
-.circleci/
+.drone.yml
 .vscode/
 venv/
 .dockerignore
@@ -8,3 +8,4 @@ Dockerfile
 email_blacklist.py
 LICENSE.md
 README.md
+k8s_definitions/
