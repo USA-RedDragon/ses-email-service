@@ -1,5 +1,4 @@
 import asyncore
-import base64
 import concurrent.futures
 import os
 import smtpd
@@ -9,6 +8,9 @@ import ssl
 
 import boto3
 from ratelimit import limits, sleep_and_retry
+
+from smtpchannel import SMTPChannel
+
 
 _DEFAULT_CIPHERS = (
     'ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+HIGH:'
@@ -44,122 +46,6 @@ if USE_BLACKLIST or USE_APIKEY:
     dynamodb = boto3.client('dynamodb')
 
 
-def decode_b64(data):
-    """Wrapper for b64decode, without having to struggle with bytestrings."""
-    byte_string = data.encode('utf-8')
-    decoded = base64.b64decode(byte_string)
-    return decoded.decode('utf-8')
-
-
-def encode_b64(data):
-    """Wrapper for b64encode, without having to struggle with bytestrings."""
-    byte_string = data.encode('utf-8')
-    encoded = base64.b64encode(byte_string)
-    return encoded.decode('utf-8')
-
-
-class CredentialValidator(object):
-    def __init__(self, username, password, smtp_server):
-        self.password = password
-
-    def validate(self):
-        item = dynamodb.get_item(
-            Key={
-                'api_key': {
-                    'S': self.password,
-                },
-            },
-            TableName=DYNAMODB_API_KEYS_TABLE,
-        )
-        return True if 'Item' in item.keys() else False
-
-
-class SMTPChannel(smtpd.SMTPChannel):
-    def __init__(self, server, conn, addr, *args, **kwargs):
-        super().__init__(server, conn, addr, *args, **kwargs)
-        self.username = None
-        self.password = None
-        self.authenticated = False
-        self.authenticating = False
-        self.credential_instance = None
-
-    @property
-    def credential_validator(self):
-        return self.smtp_server.credential_validator
-
-    def validate_credential(self, user, password):
-        self.credential_instance = self.credential_validator(user, password, self.smtp_server)
-        return self.credential_instance.validate()
-
-    @property
-    def allow_args_before_auth(self):
-        return ['AUTH', 'EHLO', 'HELO', 'NOOP', 'RSET', 'QUIT']
-
-    def run_command_with_arg(self, command, arg):
-        method = getattr(self, 'smtp_' + command, None)
-        if not method:
-            self.push('500 Error: command "%s" not recognized' % command)
-            return
-
-        # White list of operations that are allowed prior to AUTH.
-        if command not in self.allow_args_before_auth:
-            if not self.authenticated:
-                self.push('530 Authentication required')
-                return
-
-        method(arg)
-
-    def smtp_EHLO(self, arg):
-        if not arg:
-            self.push('501 Syntax: HELO hostname')
-        elif self.__greeting:
-            self.push('503 Duplicate HELO/EHLO')
-        else:
-            self.__greeting = arg
-            if isinstance(self.__conn, ssl.SSLSocket):
-                self.push(f'250 {SERVER_FQDN}')
-
-    def smtp_AUTH(self, arg):
-        if 'PLAIN' in arg:
-            split_args = arg.split(' ')
-            # second arg is Base64-encoded string of blah\0username\0password
-            authbits = decode_b64(split_args[1]).split('\0')
-            self.username = authbits[1]
-            self.password = authbits[2]
-            if self.validate_credential(self.username, self.password):
-                self.authenticated = True
-                self.push('235 Authentication successful.')
-            else:
-                self.push('454 Temporary authentication failure.')
-                self.close_when_done()
-
-        elif 'LOGIN' in arg:
-            self.authenticating = True
-            split_args = arg.split(' ')
-
-            # Some implmentations of 'LOGIN' seem to provide the username
-            # along with the 'LOGIN' stanza, hence both situations are
-            # handled.
-            if len(split_args) == 2:
-                self.username = decode_b64(arg.split(' ')[1])
-                self.push('334 ' + encode_b64('Username'))
-            else:
-                self.push('334 ' + encode_b64('Username'))
-
-        elif not self.username:
-            self.username = decode_b64(arg)
-            self.push('334 ' + encode_b64('Password'))
-        else:
-            self.authenticating = False
-            self.password = decode_b64(arg)
-            if self.validate_credential(self.username, self.password):
-                self.authenticated = True
-                self.push('235 Authentication successful.')
-            else:
-                self.push('454 Temporary authentication failure.')
-                self.close_when_done()
-
-
 class EmailRelayServer(smtpd.SMTPServer):
     def __init__(self, localaddr, remoteaddr, ssl_ctx=None):
         if ENABLE_SSL:
@@ -168,8 +54,11 @@ class EmailRelayServer(smtpd.SMTPServer):
                 certfile=SSL_CERT_PATH,
                 keyfile=SSL_KEY_PATH
             )
-        super().__init__(self, localaddr, remoteaddr)
-        print('TLS Mode: %s' % ('implicit' if ENABLE_SSL else 'disabled'), file=smtpd.DEBUGSTREAM)
+        smtpd.SMTPServer.__init__(self, localaddr, remoteaddr)
+        print(
+            'TLS Mode: %s' % ('implicit' if ENABLE_SSL else 'disabled'),
+            file=smtpd.DEBUGSTREAM
+        )
         if ENABLE_SSL:
             print(f'TLS Context: {repr(self.ssl_ctx)}', file=smtpd.DEBUGSTREAM)
 
@@ -223,7 +112,10 @@ class EmailRelayServer(smtpd.SMTPServer):
             context.verify_mode = ssl.CERT_REQUIRED
 
             if server.starttls(context=context)[0] != 220:
-                print('Not sending because STARTTLS is not enabled', file=smtpd.DEBUGSTREAM)
+                print(
+                    'Not sending because STARTTLS is not enabled',
+                    file=smtpd.DEBUGSTREAM
+                )
                 # cancel if connection is not encrypted
                 return '554 Transaction failed: STARTTLS is required'
 
@@ -242,11 +134,17 @@ class EmailRelayServer(smtpd.SMTPServer):
                     rcpt_options=rcpt_options,
                 )
             except SMTPResponseException as e:
-                print(f'SMTP Error while relaying email to SES: {str(e)}', file=smtpd.DEBUGSTREAM)
+                print(
+                    f'SMTP Error while relaying email to SES: {str(e)}',
+                    file=smtpd.DEBUGSTREAM
+                )
                 server.quit()
                 return f'{e.smtp_code} {e.smtp_error.decode()}'
             except Exception as e:
-                print(f'Error relaying email to SES: {str(e)}', file=smtpd.DEBUGSTREAM)
+                print(
+                    f'Error relaying email to SES: {str(e)}',
+                    file=smtpd.DEBUGSTREAM
+                )
                 server.quit()
                 return f'554 Transaction failed: {str(e)}'
 
@@ -265,7 +163,7 @@ def removeBlacklist(email_addresses):
             )
             if 'Item' in item.keys():
                 print(
-                    f'Removing {email} from recipients due to being blacklisted',
+                    f'Removing {email} due to being blacklisted',
                     file=smtpd.DEBUGSTREAM
                 )
             else:
@@ -276,7 +174,10 @@ def removeBlacklist(email_addresses):
 
 
 def main():
-    print(f'Email server listing on {SMTP_HOST}:{SMTP_PORT}', file=smtpd.DEBUGSTREAM)
+    print(
+        f'Email server listing on {SMTP_HOST}:{SMTP_PORT}',
+        file=smtpd.DEBUGSTREAM
+    )
     EmailRelayServer((SMTP_HOST, SMTP_PORT), None)
     try:
         asyncore.loop()
