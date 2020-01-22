@@ -20,6 +20,7 @@ _DEFAULT_CIPHERS = (
 SES_RATE_LIMIT = int(os.getenv('SES_RATE_LIMIT', '10'))
 
 DYNAMODB_TABLE = os.getenv('DYNAMODB_TABLE', '')
+DYNAMODB_API_KEYS_TABLE = os.getenv('DYNAMODB_API_KEYS_TABLE', '')
 
 SMTP_HOST = os.getenv('SMTP_HOST', '0.0.0.0')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
@@ -128,6 +129,18 @@ def removeBlacklist(email_addresses):
         return new_addresses
     else:
         return email_addresses
+
+
+def isAuthorized(api_key):
+    item = dynamodb.get_item(
+        Key={
+            'api_key': {
+                'S': api_key,
+            },
+        },
+        TableName=DYNAMODB_API_KEYS_TABLE,
+    )
+    return True if 'Item' in item.keys() else False
 
 
 def main():
