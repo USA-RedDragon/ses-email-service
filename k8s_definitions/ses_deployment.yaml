@@ -37,6 +37,12 @@ spec:
           value: email-blacklist
         - name: DYNAMODB_API_KEYS_TABLE
           value: ses-api-keys
+        - name: ENABLE_SSL
+          value: "true"
+        - name: SERVER_FQDN
+          value: "email.liquidfish.xyz"
+        - name: USE_APIKEY
+          value: "true"
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
