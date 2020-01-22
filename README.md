@@ -1,6 +1,6 @@
 # SES Email Service
 
-[![Build Status](https://drone.liquidfish.com/api/badges/liquidfish/ses-email-service/status.svg)](https://drone.liquidfish.com/liquidfish/ses-email-service)
+[![Build Status](https://drone.liquidfish.xyz/api/badges/liquidfish/ses-email-service/status.svg)](https://drone.liquidfish.xyz/liquidfish/ses-email-service)
 [![](https://images.microbadger.com/badges/image/liquidfish/ses-email-service.svg)](https://microbadger.com/images/liquidfish/ses-email-service "Get your own image badge on microbadger.com")
 
 This service is used to help with clients who need a large amount of emails sent via SES and need to deal with rate limiting.
