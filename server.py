@@ -37,6 +37,8 @@ if USE_BLACKLIST:
 
 
 class EmailRelayServer(smtpd.SMTPServer):
+    channel_class = SMTPChannel
+
     def __init__(self, localaddr, remoteaddr, ssl_ctx=None):
         if ENABLE_SSL:
             self.ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
