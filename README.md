@@ -15,7 +15,6 @@ The email service docker will update `:latest` on a push to the master branch, a
 
 |  Environment Variable   |                                                                       Details                                                                       |                     Example                     |
 | ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| `DEBUG`                 | Whether to log verbosely                                                                                                                            | `true`                                          |
 | `USE_BLACKLIST`         | Whether to use the Liquidfish email recipient blacklist                                                                                             | `true`                                          |
 | `AWS_ACCESS_KEY_ID`     | Specifies an AWS access key associated with an IAM user or role, used to access the shared blacklist                                                | `AKIA0000000000000000`                          |
 | `AWS_SECRET_ACCESS_KEY` | Specifies the secret key associated with the access key. This is essentially the "password" for the access key. Used to access the shared blacklist | `0000000000000000000000000000000000000`         |

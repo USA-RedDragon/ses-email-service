@@ -9,8 +9,6 @@ import ssl
 import boto3
 from ratelimit import limits, sleep_and_retry
 
-DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
-
 _DEFAULT_CIPHERS = (
     'ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+HIGH:'
     'DH+HIGH:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+HIGH:RSA+3DES:!aNULL:'
@@ -38,13 +36,12 @@ if USE_BLACKLIST:
 
 class EmailRelayServer(SMTPServer):
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
-        if DEBUG:
-            print('#'*80)
-            print(f'Receiving message from: {peer}')
-            print(f'Message addressed from: {mailfrom}')
-            print(f'Message addressed to  : {rcpttos}')
-            print(f'Message length        : {len(data)}')
-            print('#'*80)
+        print('#'*80)
+        print(f'Receiving message from: {peer}')
+        print(f'Message addressed from: {mailfrom}')
+        print(f'Message addressed to  : {rcpttos}')
+        print(f'Message length        : {len(data)}')
+        print('#'*80)
         return self.send_email(
             mailfrom,
             rcpttos,
@@ -78,8 +75,7 @@ class EmailRelayServer(SMTPServer):
             context.verify_mode = ssl.CERT_REQUIRED
 
             if server.starttls(context=context)[0] != 220:
-                if DEBUG:
-                    print('Not sending because STARTTLS is not enabled')
+                print('Not sending because STARTTLS is not enabled')
                 # cancel if connection is not encrypted
                 return '554 Transaction failed: STARTTLS is required'
 
@@ -98,8 +94,7 @@ class EmailRelayServer(SMTPServer):
                     rcpt_options=rcpt_options,
                 )
             except SMTPResponseException as e:
-                if DEBUG:
-                    print(f'SMTP Error while relaying email to SES: {str(e)}')
+                print(f'SMTP Error while relaying email to SES: {str(e)}')
                 server.quit()
                 return f'{e.smtp_code} {e.smtp_error.decode()}'
             except Exception as e:
