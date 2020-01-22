@@ -44,10 +44,19 @@ steps:
     password:
       from_secret: DOCKER_HUB_PASSWORD
 
-- name: Deploy
-  image: bitnami/kubectl:1.15
+
+- name: deploy
+  image: sinlead/drone-kubectl
+  settings:
+    kubernetes_server:
+      from_secret: k8s_server
+    kubernetes_cert:
+      from_secret: k8s_cert
+    kubernetes_token:
+      from_secret: k8s_token
   commands:
-  - kubectl -n global set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
+    - kubectl apply -f k8s_definitions/
+    - kubectl -n ses-email-service set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
 
 - name: notify
   image: appleboy/drone-discord
