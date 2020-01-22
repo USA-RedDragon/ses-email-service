@@ -15,7 +15,6 @@ dynamodb = boto3.client('dynamodb')
 def exit(error=None):
     if error is not None:
         print('Error occurred, sending email...')
-        print(error)
         email(error, EMAIL_FROM, EMAIL_TO)
 
 
@@ -23,6 +22,7 @@ def email(error, from_address, addresses):
     try:
         ses = boto3.client('ses', region_name=SES_REGION)
         errString = ''.join(traceback.format_exception(etype=type(error), value=error, tb=error.__traceback__))
+        print(errString)
         ses.send_email(
             Source=from_address,
             Destination={
