@@ -1,5 +1,4 @@
 import smtpd
-import ssl
 
 from auth import CredentialValidator
 from utils import decode_b64, encode_b64
@@ -45,16 +44,6 @@ class SMTPChannel(smtpd.SMTPChannel):
 
         method(arg)
 
-    def smtp_EHLO(self, arg):
-        if not arg:
-            self.push('501 Syntax: HELO hostname')
-        elif self.__greeting:
-            self.push('503 Duplicate HELO/EHLO')
-        else:
-            self.__greeting = arg
-            if isinstance(self.__conn, ssl.SSLSocket):
-                self.push(f'250 {SERVER_FQDN}')
-
     def smtp_AUTH(self, arg):
         if 'PLAIN' in arg:
             split_args = arg.split(' ')
@@ -94,3 +83,109 @@ class SMTPChannel(smtpd.SMTPChannel):
             else:
                 self.push('454 Temporary authentication failure.')
                 self.close_when_done()
+
+    def smtp_EHLO(self, arg):
+        if not arg:
+            self.push('501 Syntax: EHLO hostname')
+            return
+        # See issue #21783 for a discussion of this behavior.
+        if self.seen_greeting:
+            self.push('503 Duplicate HELO/EHLO')
+            return
+        self._set_rset_state()
+        self.seen_greeting = arg
+        self.extended_smtp = True
+        self.push(f'250-{SERVER_FQDN}')
+        self.push('250-AUTH LOGIN PLAIN')
+        if self.data_size_limit:
+            self.push('250-SIZE %s' % self.data_size_limit)
+            self.command_size_limits['MAIL'] += 26
+        if not self._decode_data:
+            self.push('250-8BITMIME')
+        if self.enable_SMTPUTF8:
+            self.push('250-SMTPUTF8')
+            self.command_size_limits['MAIL'] += 10
+
+        self.push('250 HELP')
+
+    # SMTP and ESMTP commands
+    def smtp_HELO(self, arg):
+        if not arg:
+            self.push('501 Syntax: HELO hostname')
+            return
+        # See issue #21783 for a discussion of this behavior.
+        if self.seen_greeting:
+            self.push('503 Duplicate HELO/EHLO')
+            return
+        self._set_rset_state()
+        self.seen_greeting = arg
+        self.push(f'250 {SERVER_FQDN}')
+
+        # This code is taken directly from the underlying smtpd.SMTPChannel
+        # support for AUTH is added.
+
+    def found_terminator(self):
+        line = self._emptystring.join(self.received_lines)
+        print('Data:', repr(line), file=DEBUGSTREAM)
+        self.received_lines = []
+        if self.smtp_state == self.COMMAND:
+            sz, self.num_bytes = self.num_bytes, 0
+            if not line:
+                self.push('500 Error: bad syntax')
+                return
+            if not self._decode_data:
+                line = str(line, 'utf-8')
+            i = line.find(' ')
+
+            if self.authenticating:
+                # If we are in an authenticating state, call the
+                # method smtp_AUTH.
+                arg = line.strip()
+                command = 'AUTH'
+            elif i < 0:
+                command = line.upper()
+                arg = None
+            else:
+                command = line[:i].upper()
+                arg = line[i + 1:].strip()
+            max_sz = (self.command_size_limits[command]
+                      if self.extended_smtp else self.command_size_limit)
+            if sz > max_sz:
+                self.push('500 Error: line too long')
+                return
+
+            self.run_command_with_arg(command, arg)
+            return
+        else:
+            if self.smtp_state != self.DATA:
+                self.push('451 Internal confusion')
+                self.num_bytes = 0
+                return
+            if self.data_size_limit and self.num_bytes > self.data_size_limit:
+                self.push('552 Error: Too much mail data')
+                self.num_bytes = 0
+                return
+            # Remove extraneous carriage returns and de-transparency according
+            # to RFC 5321, Section 4.5.2.
+            data = []
+            for text in line.split(self._linesep):
+                if text and text[0] == self._dotsep:
+                    data.append(text[1:])
+                else:
+                    data.append(text)
+            self.received_data = self._newline.join(data)
+            args = (self.peer, self.mailfrom, self.rcpttos, self.received_data)
+            kwargs = {
+                'credential_instance': self.credential_instance
+            }
+            if not self._decode_data:
+                kwargs.update({
+                    'mail_options': self.mail_options,
+                    'rcpt_options': self.rcpt_options,
+                })
+            status = self.smtp_server.process_message(*args, **kwargs)
+            self._set_post_data_state()
+            if not status:
+                self.push('250 OK')
+            else:
+                self.push(status)
