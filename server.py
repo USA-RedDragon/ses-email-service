@@ -1,6 +1,5 @@
 import asyncore
 import concurrent.futures
-import os
 import smtpd
 import smtplib
 from smtplib import SMTPResponseException
@@ -8,6 +7,21 @@ import ssl
 
 import boto3
 from ratelimit import limits, sleep_and_retry
+
+from config import (
+    ENABLE_SSL,
+    USE_BLACKLIST,
+    SSL_CERT_PATH,
+    SSL_KEY_PATH,
+    SES_RATE_LIMIT,
+    AWS_SMTP_HOST,
+    AWS_SMTP_PASSWORD,
+    AWS_SMTP_PORT,
+    AWS_SMTP_USERNAME,
+    SMTP_HOST,
+    SMTP_PORT,
+    DYNAMODB_TABLE,
+)
 
 from smtpchannel import SMTPChannel
 
@@ -18,31 +32,7 @@ _DEFAULT_CIPHERS = (
     '!eNULL:!MD5'
 )
 
-SES_RATE_LIMIT = int(os.getenv('SES_RATE_LIMIT', '10'))
-
-DYNAMODB_TABLE = os.getenv('DYNAMODB_TABLE', '')
-
-USE_APIKEY = os.getenv('USE_APIKEY', 'false').lower() == 'true'
-
-if USE_APIKEY:
-    DYNAMODB_API_KEYS_TABLE = os.getenv('DYNAMODB_API_KEYS_TABLE', '')
-
-SMTP_HOST = os.getenv('SMTP_HOST', '0.0.0.0')
-SMTP_PORT = int(os.getenv('SMTP_PORT', '1025'))
-
-AWS_SMTP_HOST = os.getenv('AWS_SMTP_HOST', '0.0.0.0')
-AWS_SMTP_PORT = int(os.getenv('AWS_SMTP_PORT', '1025'))
-AWS_SMTP_USERNAME = os.getenv('AWS_SMTP_USERNAME', '')
-AWS_SMTP_PASSWORD = os.getenv('AWS_SMTP_PASSWORD', '')
-
-ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
-SERVER_FQDN = os.getenv('SERVER_FQDN', '')
-SSL_CERT_PATH = os.getenv('SSL_CERT_PATH', '/ssl/tls.crt')
-SSL_KEY_PATH = os.getenv('SSL_KEY_PATH', '/ssl/tls.key')
-
-USE_BLACKLIST = os.getenv('USE_BLACKLIST', 'false').lower() == 'true'
-
-if USE_BLACKLIST or USE_APIKEY:
+if USE_BLACKLIST:
     dynamodb = boto3.client('dynamodb')
 
 
@@ -69,7 +59,10 @@ class EmailRelayServer(smtpd.SMTPServer):
             print(f'Incoming connection from {addr}', file=smtpd.DEBUGSTREAM)
             if ENABLE_SSL and self.ssl_ctx:
                 conn = self.ssl_ctx.wrap_socket(conn, server_side=True)
-                print(f'Peer: {repr(addr)} - negotiated TLS: {repr(conn.cipher())}', file=smtpd.DEBUGSTREAM)
+                print(
+                    f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
+                    file=smtpd.DEBUGSTREAM
+                )
             channel = SMTPChannel(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
@@ -175,8 +168,7 @@ def removeBlacklist(email_addresses):
 
 def main():
     print(
-        f'Email server listing on {SMTP_HOST}:{SMTP_PORT}',
-        file=smtpd.DEBUGSTREAM
+        f'Email server listing on {SMTP_HOST}:{SMTP_PORT}'
     )
     EmailRelayServer((SMTP_HOST, SMTP_PORT), None)
     try:

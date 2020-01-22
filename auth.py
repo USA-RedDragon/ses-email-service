@@ -1,6 +1,6 @@
 import boto3
 
-from server import DYNAMODB_API_KEYS_TABLE, USE_APIKEY
+from config import DYNAMODB_API_KEYS_TABLE, USE_APIKEY
 
 
 if USE_APIKEY:

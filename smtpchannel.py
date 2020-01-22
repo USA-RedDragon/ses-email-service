@@ -2,7 +2,7 @@ import smtpd
 import ssl
 
 from utils import decode_b64, encode_b64
-from server import SERVER_FQDN
+from config import SERVER_FQDN
 
 
 class SMTPChannel(smtpd.SMTPChannel):
