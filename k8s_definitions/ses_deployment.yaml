@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: ses-email-service-deployment
-  namespace: global
+  namespace: ses-email-service
 spec:
   replicas: 1
   selector:
@@ -16,6 +16,10 @@ spec:
       containers:
       - name: ses-email-service
         image: liquidfish/ses-email-service:latest
+        volumeMounts:
+        - name: ssl
+          mountPath: "/ssl"
+          readOnly: true
         env:
         - name: USE_BLACKLIST
           value: "true"
@@ -31,6 +35,8 @@ spec:
           value: "587"
         - name: DYNAMODB_TABLE
           value: email-blacklist
+        - name: DYNAMODB_API_KEYS_TABLE
+          value: ses-api-keys
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
@@ -53,3 +59,7 @@ spec:
               key: aws-smtp-password
         ports:
         - containerPort: 1025
+      volumes:
+      - name: ssl
+        secret:
+          secretName: email-liquidfish-xyz-tls

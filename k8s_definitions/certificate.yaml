@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: email-liquidfish-xyz
+  namespace: ses-email-service
+spec:
+  secretName: email-liquidfish-xyz-tls
+  dnsNames:
+  - email.liquidfish.xyz
+  issuerRef:
+    name: letsencrypt-liquidfish-xyz
+    kind: Issuer
+    group: cert-manager.io

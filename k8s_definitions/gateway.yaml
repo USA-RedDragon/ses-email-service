@@ -1,0 +1,34 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: email-gateway
+  namespace: ses-email-service
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 1025
+      name: smtp
+      protocol: TCP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: email-virutal-service
+  namespace: ses-email-service
+spec:
+  hosts:
+  - "email.liquidfish.xyz"
+  gateways:
+  - email-gateway
+  tcp:
+  - match:
+    - port: 1025
+    route:
+    - destination:
+        host: ses-email-service
+        port:
+          number: 1025
