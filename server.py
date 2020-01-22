@@ -65,7 +65,7 @@ class EmailRelayServer(smtpd.SMTPServer):
                     f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
                     file=smtpd.DEBUGSTREAM
                 )
-            channel = SMTPChannel(self, conn, addr)
+            self.channel = SMTPChannel(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
         print('#'*80, file=smtpd.DEBUGSTREAM)
