@@ -1,6 +1,7 @@
 import smtpd
 import ssl
 
+from auth import CredentialValidator
 from utils import decode_b64, encode_b64
 from config import SERVER_FQDN
 
@@ -16,7 +17,7 @@ class SMTPChannel(smtpd.SMTPChannel):
 
     @property
     def credential_validator(self):
-        return self.smtp_server.credential_validator
+        return CredentialValidator
 
     def validate_credential(self, user, password):
         self.credential_instance = self.credential_validator(
