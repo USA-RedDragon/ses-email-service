@@ -64,7 +64,7 @@ spec:
               name: ses-email-service
               key: aws-smtp-password
         ports:
-        - containerPort: 1025
+        - containerPort: 465
       volumes:
       - name: ssl
         secret:

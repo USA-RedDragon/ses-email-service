@@ -8,7 +8,7 @@ spec:
     istio: ingressgateway
   servers:
   - port:
-      number: 1025
+      number: 465
       name: smtp
       protocol: TCP
     hosts:
@@ -26,9 +26,9 @@ spec:
   - email-gateway
   tcp:
   - match:
-    - port: 1025
+    - port: 465
     route:
     - destination:
         host: ses-email-service
         port:
-          number: 1025
+          number: 465

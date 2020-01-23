@@ -9,5 +9,5 @@ spec:
   ports:
     - name: smtp
       protocol: TCP
-      port: 1025
-      targetPort: 1025
+      port: 465
+      targetPort: 465
