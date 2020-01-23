@@ -1,3 +1,4 @@
+---
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
@@ -7,28 +8,28 @@ spec:
   selector:
     istio: ingressgateway
   servers:
-  - port:
-      number: 465
-      name: smtp
-      protocol: TCP
-    hosts:
-    - "*"
+    - port:
+        number: 465
+        name: smtp
+        protocol: TCP
+      hosts:
+        - "*"
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: email-virutal-service
+  name: email-virtual-service
   namespace: ses-email-service
 spec:
   hosts:
-  - "email.liquidfish.xyz"
+    - "email.liquidfish.xyz"
   gateways:
-  - email-gateway
+    - email-gateway
   tcp:
-  - match:
-    - port: 465
-    route:
-    - destination:
-        host: ses-email-service
-        port:
-          number: 465
+    - match:
+      - port: 465
+      route:
+        - destination:
+            host: ses-email-service
+            port:
+              number: 465
