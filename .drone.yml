@@ -32,15 +32,6 @@ type: docker
 name: ses-email-service
 
 steps:
-- name: code-analysis
-  image: aosapps/drone-sonar-plugin
-  settings:
-    sonar_host:
-      from_secret: sonar_host
-    sonar_token:
-      from_secret: sonar_token
-    ver: ${DRONE_COMMIT}
-
 - name: Build
   image: plugins/docker
   settings:
