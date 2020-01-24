@@ -65,6 +65,7 @@ spec:
               key: aws-smtp-password
         ports:
         - containerPort: 465
+          protocol: TCP
       volumes:
       - name: ssl
         secret:

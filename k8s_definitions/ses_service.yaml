@@ -7,7 +7,7 @@ spec:
   selector:
     app: ses-email-service
   ports:
-    - name: smtp
+    - name: tcp-smtp
       protocol: TCP
       port: 465
       targetPort: 465
