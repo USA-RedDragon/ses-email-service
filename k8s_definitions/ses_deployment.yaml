@@ -66,6 +66,13 @@ spec:
         ports:
         - containerPort: 465
           protocol: TCP
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+          requests:
+            cpu: 50m
+            memory: 50Mi
       volumes:
       - name: ssl
         secret:
