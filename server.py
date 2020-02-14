@@ -4,6 +4,7 @@ import smtpd
 import smtplib
 from smtplib import SMTPResponseException
 import ssl
+import sys
 
 import boto3
 from ratelimit import limits, sleep_and_retry
@@ -49,31 +50,31 @@ class EmailRelayServer(smtpd.SMTPServer):
         smtpd.SMTPServer.__init__(self, localaddr, remoteaddr)
         print(
             'TLS Mode: %s' % ('implicit' if ENABLE_SSL else 'disabled'),
-            file=smtpd.DEBUGSTREAM
+            file=sys.stdout
         )
         if ENABLE_SSL:
-            print(f'TLS Context: {repr(self.ssl_ctx)}', file=smtpd.DEBUGSTREAM)
+            print(f'TLS Context: {repr(self.ssl_ctx)}', file=sys.stdout)
 
     def handle_accept(self):
         pair = self.accept()
         if pair is not None:
             conn, addr = pair
-            print(f'Incoming connection from {addr}', file=smtpd.DEBUGSTREAM)
+            print(f'Incoming connection from {addr}', file=sys.stdout)
             if ENABLE_SSL and self.ssl_ctx:
                 conn = self.ssl_ctx.wrap_socket(conn, server_side=True)
                 print(
                     f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
-                    file=smtpd.DEBUGSTREAM
+                    file=sys.stdout
                 )
             self.channel = SMTPChannel(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
-        print('#'*80, file=smtpd.DEBUGSTREAM)
-        print(f'Receiving message from: {peer}', file=smtpd.DEBUGSTREAM)
-        print(f'Message addressed from: {mailfrom}', file=smtpd.DEBUGSTREAM)
-        print(f'Message addressed to  : {rcpttos}', file=smtpd.DEBUGSTREAM)
-        print(f'Message length        : {len(data)}', file=smtpd.DEBUGSTREAM)
-        print('#'*80, file=smtpd.DEBUGSTREAM)
+        print('#'*80, file=sys.stdout)
+        print(f'Receiving message from: {peer}', file=sys.stdout)
+        print(f'Message addressed from: {mailfrom}', file=sys.stdout)
+        print(f'Message addressed to  : {rcpttos}', file=sys.stdout)
+        print(f'Message length        : {len(data)}', file=sys.stdout)
+        print('#'*80, file=sys.stdout)
         return self.send_email(
             mailfrom,
             rcpttos,
@@ -109,7 +110,7 @@ class EmailRelayServer(smtpd.SMTPServer):
             if server.starttls(context=context)[0] != 220:
                 print(
                     'Not sending because STARTTLS is not enabled',
-                    file=smtpd.DEBUGSTREAM
+                    file=sys.stdout
                 )
                 # cancel if connection is not encrypted
                 return '554 Transaction failed: STARTTLS is required'
@@ -131,14 +132,14 @@ class EmailRelayServer(smtpd.SMTPServer):
             except SMTPResponseException as e:
                 print(
                     f'SMTP Error while relaying email to SES: {str(e)}',
-                    file=smtpd.DEBUGSTREAM
+                    file=sys.stdout
                 )
                 server.quit()
                 return f'{e.smtp_code} {e.smtp_error.decode()}'
             except Exception as e:
                 print(
                     f'Error relaying email to SES: {str(e)}',
-                    file=smtpd.DEBUGSTREAM
+                    file=sys.stdout
                 )
                 server.quit()
                 return f'554 Transaction failed: {str(e)}'
@@ -159,7 +160,7 @@ def removeBlacklist(email_addresses):
             if 'Item' in item.keys():
                 print(
                     f'Removing {email} due to being blacklisted',
-                    file=smtpd.DEBUGSTREAM
+                    file=sys.stdout
                 )
             else:
                 new_addresses.append(email)

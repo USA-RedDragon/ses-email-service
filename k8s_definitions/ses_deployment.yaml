@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ses-email-service
-        image: liquidfish/ses-email-service:latest
+        image: harbor.liquidfish.xyz/public/ses-email-service
         volumeMounts:
         - name: ssl
           mountPath: "/ssl"
@@ -25,6 +25,8 @@ spec:
           value: "true"
         - name: DEBUG
           value: "true"
+        - name: PYTHONUNBUFFERED
+          value: "1"
         - name: AWS_DEFAULT_REGION
           value: us-east-1
         - name: SES_RATE_LIMIT

@@ -1,6 +1,11 @@
+---
 kind: pipeline
 type: docker
 name: ses-email-service-lambda
+
+platform:
+  os: linux
+  arch: amd64
 
 steps:
 - name: Zip
@@ -10,6 +15,9 @@ steps:
 
 - name: Deploy
   image: liquidfish/aws-cli
+  commands:
+  - aws lambda update-function-code --function-name EmailBlacklist --zip-file fileb://./email-blacklist.zip
+  - echo "Publishing Lambda version $(aws lambda publish-version --function-name EmailBlacklist | jq -r .Version)"
   environment:
     AWS_ACCESS_KEY_ID:
       from_secret: AWS_ACCESS_KEY_ID
@@ -17,73 +25,59 @@ steps:
       from_secret: AWS_DEFAULT_REGION
     AWS_SECRET_ACCESS_KEY:
       from_secret: AWS_SECRET_ACCESS_KEY
-  commands:
-  - aws lambda update-function-code --function-name EmailBlacklist --zip-file fileb://./email-blacklist.zip
-  - echo "Publishing Lambda version $(aws lambda publish-version --function-name EmailBlacklist | jq -r .Version)"
 
 trigger:
   branch:
   - master
 
 ---
-
 kind: pipeline
 type: docker
 name: ses-email-service
+
+platform:
+  os: linux
+  arch: amd64
 
 steps:
 - name: Build
   image: plugins/docker
   settings:
-    repo: liquidfish/ses-email-service
-    tags:
-      - latest
-      - ${DRONE_COMMIT}
-    username:
-      from_secret: DOCKER_HUB_USERNAME
     password:
-      from_secret: DOCKER_HUB_PASSWORD
-
+      from_secret: HARBOR_PASSWORD
+    registry: https://harbor.liquidfish.xyz
+    repo: harbor.liquidfish.xyz/public/ses-email-service
+    tags:
+    - latest
+    - ${DRONE_COMMIT}
+    username:
+      from_secret: HARBOR_USERNAME
 
 - name: deploy
   image: sinlead/drone-kubectl
-  settings:
-    kubernetes_server:
-      from_secret: k8s_server
-    kubernetes_cert:
-      from_secret: k8s_cert
-    kubernetes_token:
-      from_secret: k8s_token
   commands:
-    - kubectl apply -f k8s_definitions/
-    - kubectl -n ses-email-service set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
+  - kubectl apply -f k8s_definitions/
+  - kubectl -n ses-email-service set image deployment/ses-email-service-deployment ses-email-service=harbor.liquidfish.xyz/public/ses-email-service:${DRONE_COMMIT} --record
+  settings:
+    kubernetes_cert:
+      from_secret: LF_K8S_CERTIFICATE
+    kubernetes_server:
+      from_secret: LF_K8S_SERVER
+    kubernetes_token:
+      from_secret: LF_K8S_TOKEN
 
 - name: notify
   image: appleboy/drone-discord
   settings:
+    message: "**{{#success build.status}}:white_check_mark:{{ else }}:x:{{/success}} {{ uppercasefirst build.status }}: Build #{{ build.number }}**\n\n{{#if build.pull }}\n  Pull Request: #{{ build.pull }} https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/pull-requests/{{ build.pull }}\n{{/if}}\nCommit: {{ build.commit }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.commit }}\nBranch: {{ build.branch }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}\nAuthor: {{ build.author }}\n\n{{ build.link }}\n"
+    username: LiquidCI
     webhook_id:
       from_secret: DISCORD_WEBHOOK_ID
     webhook_token:
       from_secret: DISCORD_WEBHOOK_SECRET
-    username: LiquidCI
-    message: >
-      **{{#success build.status}}:white_check_mark:{{ else }}:x:{{/success}} {{ uppercasefirst build.status }}: Build #{{ build.number }}**
-
-
-      {{#if build.pull }}
-        Pull Request: #{{ build.pull }} https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/pull-requests/{{ build.pull }}
-      {{/if}}
-
-      Commit: {{ build.commit }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.commit }}
-
-      Branch: {{ build.branch }} - https://bitbucket.org/{{ repo.owner }}/{{ repo.name }}/commits/{{ build.branch }}
-
-      Author: {{ build.author }}
-
-
-      {{ build.link }}
 
 trigger:
   ref:
   - refs/heads/master
 
+...
