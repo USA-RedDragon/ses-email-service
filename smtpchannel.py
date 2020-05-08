@@ -126,7 +126,6 @@ class SMTPChannel(smtpd.SMTPChannel):
 
     def found_terminator(self):
         line = self._emptystring.join(self.received_lines)
-        print('Data:', repr(line), file=smtpd.DEBUGSTREAM)
         self.received_lines = []
         if self.smtp_state == self.COMMAND:
             sz, self.num_bytes = self.num_bytes, 0
