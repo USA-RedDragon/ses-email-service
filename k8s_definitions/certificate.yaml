@@ -1,4 +1,4 @@
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1alpha3
 kind: Certificate
 metadata:
   name: email-liquidfish-xyz
@@ -9,5 +9,5 @@ spec:
   - email.liquidfish.xyz
   issuerRef:
     name: letsencrypt-liquidfish-xyz
-    kind: Issuer
+    kind: ClusterIssuer
     group: cert-manager.io

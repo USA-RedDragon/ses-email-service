@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: ses-email-service
-        image: harbor.liquidfish.xyz/public/ses-email-service
+        image: liquidfish/ses-email-service
         volumeMounts:
         - name: ssl
           mountPath: "/ssl"

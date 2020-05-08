@@ -44,27 +44,31 @@ steps:
   image: plugins/docker
   settings:
     password:
-      from_secret: HARBOR_PASSWORD
-    registry: https://harbor.liquidfish.xyz
-    repo: harbor.liquidfish.xyz/public/ses-email-service
+      from_secret: LF_DOCKER_HUB_PASSWORD
+    repo: liquidfish/ses-email-service
     tags:
     - latest
     - ${DRONE_COMMIT}
     username:
-      from_secret: HARBOR_USERNAME
+      from_secret: LF_DOCKER_HUB_USERNAME
 
 - name: deploy
-  image: sinlead/drone-kubectl
+  image: lachlanevenson/k8s-helm
   commands:
+  - apk add curl
+  - curl -Lo /usr/local/bin/kubectl https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+  - chmod a+x /usr/local/bin/kubectl
+  - curl -fSsL https://github.com/digitalocean/doctl/releases/download/v1.43.0/doctl-1.43.0-linux-amd64.tar.gz -o - | tar -xvzf-
+  - mv doctl /usr/local/bin/doctl
+  - doctl auth init -t $LF_DO_API_KEY
+  - doctl kubernetes cluster kubeconfig save $LF_DO_K8S_NAME
   - kubectl apply -f k8s_definitions/
-  - kubectl -n ses-email-service set image deployment/ses-email-service-deployment ses-email-service=harbor.liquidfish.xyz/public/ses-email-service:${DRONE_COMMIT} --record
-  settings:
-    kubernetes_cert:
-      from_secret: LF_K8S_CERTIFICATE
-    kubernetes_server:
-      from_secret: LF_K8S_SERVER
-    kubernetes_token:
-      from_secret: LF_K8S_TOKEN
+  - kubectl -n ses-email-service set image deployment/ses-email-service-deployment ses-email-service=liquidfish/ses-email-service:${DRONE_COMMIT} --record
+  environment:
+    LF_DO_API_KEY:
+      from_secret: LF_DO_API_KEY
+    LF_DO_K8S_NAME:
+      from_secret: LF_DO_K8S_NAME
 
 - name: notify
   image: appleboy/drone-discord

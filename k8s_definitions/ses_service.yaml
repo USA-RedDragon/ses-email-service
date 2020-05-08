@@ -4,6 +4,7 @@ metadata:
   name: ses-email-service
   namespace: ses-email-service
 spec:
+  type: LoadBalancer
   selector:
     app: ses-email-service
   ports:
