@@ -84,27 +84,4 @@ trigger:
   ref:
   - refs/heads/master
 
----
-kind: pipeline
-type: kubernetes
-name: ses-email-service-sca
-
-platform:
-  os: linux
-  arch: amd64
-
-steps:
-- name: code-analysis
-  image: aosapps/drone-sonar-plugin
-  settings:
-    sonar_host: https://sonarqube.liquidfish.xyz
-    sonar_token:
-      from_secret: SONAR_TOKEN
-  usingProperties: true
-
-trigger:
-  ref:
-  - refs/heads/staging
-  - refs/heads/master
-
 ...
