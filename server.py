@@ -61,11 +61,15 @@ class EmailRelayServer(smtpd.SMTPServer):
             conn, addr = pair
             print(f'Incoming connection from {addr}', file=sys.stdout)
             if ENABLE_SSL and self.ssl_ctx:
-                conn = self.ssl_ctx.wrap_socket(conn, server_side=True)
-                print(
-                    f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
-                    file=sys.stdout
-                )
+                try:
+                    conn = self.ssl_ctx.wrap_socket(conn, server_side=True)
+                    print(
+                        f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
+                        file=sys.stdout
+                    )
+                except ssl.SSLEOFError as e:
+                    print(f'Peer {repr(addr)} invalidated the SSL protocol, dropping.')
+                    return
             self.channel = SMTPChannel(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
