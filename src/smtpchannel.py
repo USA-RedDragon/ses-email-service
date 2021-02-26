@@ -1,4 +1,4 @@
-import smtpd
+from upstream import smtpd
 
 from auth import CredentialValidator
 from utils import decode_b64, encode_b64

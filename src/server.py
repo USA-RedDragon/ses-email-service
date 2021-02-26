@@ -1,10 +1,11 @@
 import asyncore
 import concurrent.futures
-import smtpd
 import smtplib
 from smtplib import SMTPResponseException
 import ssl
 import sys
+
+from upstream import smtpd
 
 import boto3
 from ratelimit import limits, sleep_and_retry
