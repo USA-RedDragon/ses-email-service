@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1alpha3
 kind: Certificate
 metadata:
-  name: email-liquidfish-xyz
+  name: email-mcswain-dev
   namespace: ses-email-service
 spec:
-  secretName: email-liquidfish-xyz-tls
+  secretName: email-mcswain-dev-tls
   dnsNames:
-  - email.liquidfish.xyz
+  - email.mcswain.dev
   issuerRef:
-    name: letsencrypt-liquidfish-xyz
+    name: cloudflare
     kind: ClusterIssuer
     group: cert-manager.io

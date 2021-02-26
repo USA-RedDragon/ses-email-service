@@ -42,7 +42,7 @@ class EmailRelayServer(smtpd.SMTPServer):
 
     def __init__(self, localaddr, remoteaddr, ssl_ctx=None):
         if ENABLE_SSL:
-            self.ssl_ctx = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
+            self.ssl_ctx = context = ssl.SSLContext(ssl.PROTOCOL_TLS)
             self.ssl_ctx.load_cert_chain(
                 certfile=SSL_CERT_PATH,
                 keyfile=SSL_KEY_PATH
@@ -68,7 +68,7 @@ class EmailRelayServer(smtpd.SMTPServer):
                         file=sys.stdout
                     )
                 except ssl.SSLEOFError as e:
-                    print(f'Peer {repr(addr)} invalidated the SSL protocol, dropping.')
+                    print(f'Peer {repr(addr)} invalidated the SSL protocol, dropping.\n{repr(e)}')
                     return
             self.channel = SMTPChannel(self, conn, addr)
 

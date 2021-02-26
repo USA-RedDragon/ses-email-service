@@ -1,4 +1,4 @@
-FROM python:alpine3.7
+FROM python:alpine3.8
 
 WORKDIR /app
 
@@ -6,6 +6,6 @@ COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
-COPY . ./
+COPY src/ ./
 
 ENTRYPOINT [ "python", "-u", "server.py" ]

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ses-email-service-deployment
+  name: ses-email-service
   namespace: ses-email-service
 spec:
   replicas: 1
@@ -12,15 +12,16 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: ses-email-service
+      app.kubernetes.io/name: ses-email-service
   template:
     metadata:
       labels:
-        app: ses-email-service
+        app.kubernetes.io/name: ses-email-service
     spec:
       containers:
       - name: ses-email-service
-        image: liquidfish/ses-email-service
+        image: jamcswain/ses-email-service
+        imagePullPolicy: Always
         volumeMounts:
         - name: ssl
           mountPath: "/ssl"
@@ -47,7 +48,7 @@ spec:
         - name: ENABLE_SSL
           value: "true"
         - name: SERVER_FQDN
-          value: "email.liquidfish.xyz"
+          value: "email.mcswain.dev"
         - name: USE_APIKEY
           value: "true"
         - name: AWS_ACCESS_KEY_ID
@@ -83,4 +84,4 @@ spec:
       volumes:
       - name: ssl
         secret:
-          secretName: email-liquidfish-xyz-tls
+          secretName: email-mcswain-dev-tls
