@@ -47,7 +47,7 @@ you - by calling your self.found_terminator() method.
 """
 import asyncore
 from collections import deque
-
+import ssl
 
 class async_chat(asyncore.dispatcher):
     """This is an abstract class.  You must derive from this class, and add
@@ -116,6 +116,8 @@ class async_chat(asyncore.dispatcher):
         try:
             data = self.recv(self.ac_in_buffer_size)
         except BlockingIOError:
+            return
+        except ssl.SSLWantReadError:
             return
         except OSError:
             self.handle_error()
