@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+defaults:
+  run:
+    working-directory: ./infra/aws
+
 jobs:
   build:
     runs-on: ubuntu-20.04
