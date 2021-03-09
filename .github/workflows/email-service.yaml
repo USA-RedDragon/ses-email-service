@@ -32,7 +32,7 @@ jobs:
         with:
           push: true
           tags: jamcswain/ses-email-service:latest,jamcswain/ses-email-service:${{ github.sha }}
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,darwin/amd64,darwin/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
