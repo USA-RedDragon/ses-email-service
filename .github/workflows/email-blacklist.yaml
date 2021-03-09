@@ -1,0 +1,39 @@
+name: Build Email Blacklist Lambda
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.14.7
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Place secret variables
+        id: add-creds
+        run: |
+          echo "${TFVARS}" | base64 -d > variables.tfvars
+        env:
+          TFVARS: ${{ secrets.TFVARS }}
+
+      - name: Terraform Apply
+        run: terraform apply -no-color -auto-approve -var-file=variables.tfvars
