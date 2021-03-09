@@ -7,9 +7,6 @@ on:
       - edited
       - reopened
       - synchronize
-  push:
-    branches:
-      - master
 
 defaults:
   run:
@@ -78,5 +75,9 @@ jobs:
           
           *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Workflow: \`${{ github.workflow }}\`*`;
 
-          return output
-        result-encoding: string
+          github.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: output
+          })
