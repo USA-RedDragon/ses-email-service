@@ -16,9 +16,18 @@ defaults:
     working-directory: ./infra/aws
 
 jobs:
-  build:
+  check:
     runs-on: ubuntu-20.04
     steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.14.7
+
     - name: Terraform fmt
       id: fmt
       run: terraform fmt -check
