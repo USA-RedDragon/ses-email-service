@@ -1,4 +1,4 @@
-boto3==1.26.158
+boto3==1.26.159
 botocore==1.29.158
 docutils==0.20.1
 jmespath==1.0.1
