@@ -60,6 +60,7 @@ jobs:
         FMT: "${{ steps.fmt.outputs.stdout }}"
         INIT: "${{ steps.init.outputs.stderr }}"
         VALIDATE: "${{ steps.validate.outputs.stderr }}"
+        PLAN: "${{ steps.validate.plan.stderr }}"
       with:
         result-encoding: string
         script: |
@@ -107,6 +108,18 @@ jobs:
           </details>`;
           }
 
+          if ("${{ steps.plan.outcome }}" == "success") {
+            comment += `\n#### ✅ Terraform Plan Passed`;
+          } else {
+            comment += `\n#### ❌ Terraform Plan Failed
+          <details>
+          <summary><code>terraform plan</code> output</summary>
+          <pre>\n
+          ${process.env.PLAN}
+          </pre>\n
+          </details>`;
+          }
+
           return comment;
 
     - name: Find Comment
@@ -128,5 +141,5 @@ jobs:
         body: ${{ steps.github-script.outputs.result }}
 
     - name: Error if failed
-      if: steps.fmt.outcome == 'failure' || steps.validate.outcome == 'failure' || steps.init.outcome == 'failure'
+      if: steps.fmt.outcome == 'failure' || steps.validate.outcome == 'failure' || steps.init.outcome == 'failure' || steps.plan.outcome == 'failure'
       run: exit 1
