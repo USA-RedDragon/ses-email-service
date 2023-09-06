@@ -60,7 +60,7 @@ jobs:
         FMT: "${{ steps.fmt.outputs.stdout }}"
         INIT: "${{ steps.init.outputs.stderr }}"
         VALIDATE: "${{ steps.validate.outputs.stderr }}"
-        PLAN: "${{ steps.validate.plan.stderr }}"
+        PLAN: "${{ steps.plan.outputs.stderr }}"
       with:
         result-encoding: string
         script: |
