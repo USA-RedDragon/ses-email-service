@@ -69,7 +69,8 @@ jobs:
         FMT: "${{ steps.fmt.outputs.stdout }}"
         INIT: "${{ steps.init.outputs.stderr }}"
         VALIDATE: "${{ steps.validate.outputs.stderr }}"
-        PLAN: "${{ steps.plan.outputs.stderr }}"
+        PLAN_ERR: "${{ steps.plan.outputs.stderr }}"
+        PLAN_OUT: "${{ steps.plan.outputs.stdout }}"
       with:
         result-encoding: string
         script: |
@@ -125,8 +126,15 @@ jobs:
           comment += `
           <details>
           <summary><code>terraform plan</code> output</summary>
-          <pre>\n
-          ${process.env.PLAN}
+          <pre>\n`;
+
+          if ("${{ steps.plan.outcome }}" == "success") {
+            comment += `${process.env.PLAN_OUT}`;
+          } else {
+            comment += `${process.env.PLAN_ERR}`;
+          }
+          
+          comment += `
           </pre>\n
           </details>`;
 
