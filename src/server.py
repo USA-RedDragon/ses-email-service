@@ -12,7 +12,7 @@ from ratelimit import limits, sleep_and_retry
 
 from config import (
     ENABLE_SSL,
-    USE_BLACKLIST,
+    USE_BLOCKLIST,
     SSL_CERT_PATH,
     SSL_KEY_PATH,
     SES_RATE_LIMIT,
@@ -34,7 +34,7 @@ _DEFAULT_CIPHERS = (
     '!eNULL:!MD5'
 )
 
-if USE_BLACKLIST:
+if USE_BLOCKLIST:
     dynamodb = boto3.client('dynamodb')
 
 
@@ -123,9 +123,9 @@ class EmailRelayServer(smtpd.SMTPServer):
             server.login(AWS_SMTP_USERNAME, AWS_SMTP_PASSWORD)
 
             try:
-                if USE_BLACKLIST:
-                    # Filter out blacklisted email addresses
-                    rcpttos = removeBlacklist(rcpttos)
+                if USE_BLOCKLIST:
+                    # Filter out blocklisted email addresses
+                    rcpttos = removeBlocklist(rcpttos)
 
                 server.sendmail(
                     mailfrom,
@@ -150,8 +150,8 @@ class EmailRelayServer(smtpd.SMTPServer):
                 return f'554 Transaction failed: {str(e)}'
 
 
-def removeBlacklist(email_addresses):
-    if USE_BLACKLIST:
+def removeBlocklist(email_addresses):
+    if USE_BLOCKLIST:
         new_addresses = []
         for email in email_addresses:
             item = dynamodb.get_item(
@@ -164,7 +164,7 @@ def removeBlacklist(email_addresses):
             )
             if 'Item' in item.keys():
                 print(
-                    f'Removing {email} due to being blacklisted',
+                    f'Removing {email} due to being blocklisted',
                     file=sys.stdout
                 )
             else:

@@ -12,8 +12,8 @@ output "email_service_secret_key" {
   sensitive = true
 }
 
-output "dynamodb_table_blacklist" {
-  value = aws_dynamodb_table.email_blacklist.name
+output "dynamodb_table_blocklist" {
+  value = aws_dynamodb_table.email_blocklist.name
 }
 
 output "dynamodb_table_api_keys" {

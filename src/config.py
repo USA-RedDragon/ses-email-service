@@ -24,6 +24,6 @@ ENABLE_SSL = os.getenv('ENABLE_SSL', 'false').lower() == 'true'
 SSL_CERT_PATH = os.getenv('SSL_CERT_PATH', '/ssl/tls.crt')
 SSL_KEY_PATH = os.getenv('SSL_KEY_PATH', '/ssl/tls.key')
 
-# Blacklist Stripping
-USE_BLACKLIST = os.getenv('USE_BLACKLIST', 'false').lower() == 'true'
+# Blocklist Stripping
+USE_BLOCKLIST = os.getenv('USE_BLOCKLIST', 'false').lower() == 'true'
 DYNAMODB_TABLE = os.getenv('DYNAMODB_TABLE', '')

@@ -1,5 +1,5 @@
 
-resource "aws_iam_role" "email_blacklist" {
+resource "aws_iam_role" "email_blocklist" {
   name = var.lambda_function_name
 
   assume_role_policy = <<EOF
@@ -25,10 +25,10 @@ resource "aws_iam_role" "email_blacklist" {
 EOF
 }
 
-resource "aws_iam_policy" "email_blacklist" {
+resource "aws_iam_policy" "email_blocklist" {
   name        = var.lambda_function_name
   path        = "/"
-  description = "IAM policy for lambda email blacklist"
+  description = "IAM policy for lambda email blocklist"
 
   policy = <<EOF
 {
@@ -40,7 +40,7 @@ resource "aws_iam_policy" "email_blacklist" {
         "logs:CreateLogStream",
         "logs:PutLogEvents"
       ],
-      "Resource": "${aws_cloudwatch_log_group.email_blacklist.arn}",
+      "Resource": "${aws_cloudwatch_log_group.email_blocklist.arn}",
       "Effect": "Allow"
     },
     {
@@ -69,7 +69,7 @@ resource "aws_iam_policy" "email_blacklist" {
       "Action": [
         "dynamodb:PutItem"
       ],
-      "Resource": "${aws_dynamodb_table.email_blacklist.arn}"
+      "Resource": "${aws_dynamodb_table.email_blocklist.arn}"
     }
   ]
 }
@@ -100,7 +100,7 @@ resource "aws_iam_policy" "email_service" {
         "dynamodb:GetItem"
       ],
       "Resource": [
-        "${aws_dynamodb_table.email_blacklist.arn}",
+        "${aws_dynamodb_table.email_blocklist.arn}",
         "${aws_dynamodb_table.api_keys.arn}"
       ]
     }
@@ -109,9 +109,9 @@ resource "aws_iam_policy" "email_service" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "email_blacklist" {
-  role       = aws_iam_role.email_blacklist.name
-  policy_arn = aws_iam_policy.email_blacklist.arn
+resource "aws_iam_role_policy_attachment" "email_blocklist" {
+  role       = aws_iam_role.email_blocklist.name
+  policy_arn = aws_iam_policy.email_blocklist.arn
 }
 
 resource "aws_iam_user" "email_service" {
