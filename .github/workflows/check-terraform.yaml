@@ -8,8 +8,9 @@ defaults:
     working-directory: ./infra/aws
 
 permissions:
-  id-token: write # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+  id-token: write      # Required for aws-actions/configure-aws-credentials
+  contents: read       # Required for actions/checkout
+  pull-requests: write # Required for peter-evans/create-or-update-comment
 
 jobs:
   check:
