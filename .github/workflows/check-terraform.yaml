@@ -125,8 +125,8 @@ jobs:
           }
           comment += `
           <details>
-          <summary><code>terraform plan</code> output</summary>
-          <pre>\n`;
+          <summary><code>terraform plan</code> output</summary>\n
+          \`\`\`text\n`;
 
           if ("${{ steps.plan.outcome }}" == "success") {
             comment += `${process.env.PLAN_OUT}`;
@@ -135,7 +135,7 @@ jobs:
           }
           
           comment += `
-          </pre>\n
+          \`\`\`\n
           </details>`;
 
           return comment;
