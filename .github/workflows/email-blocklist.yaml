@@ -1,4 +1,4 @@
-name: Build Email Blacklist Lambda
+name: Build Email Blocklist Lambda
 
 on:
   push:

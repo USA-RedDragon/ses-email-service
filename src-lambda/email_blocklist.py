@@ -36,11 +36,11 @@ def email(error, from_address, addresses):
             },
             Message={
                 'Subject': {
-                    'Data': 'SES Error: Email Blacklist Failed'
+                    'Data': 'SES Error: Email Blocklist Failed'
                 },
                 'Body': {
                     'Text': {
-                        'Data': f'Failed to add emails to blacklist:\n' +
+                        'Data': f'Failed to add emails to blocklist:\n' +
                         f'{errString}'
                     }
                 }
@@ -68,7 +68,7 @@ def lambda_handler(event, context):
                         },
                         TableName=DYNAMODB_TABLE,
                     )
-                    print(f'{email} is a bounced email address, blacklisting')
+                    print(f'{email} is a bounced email address, blocklisting')
             elif sns_message['notificationType'] == 'Bounce' and \
                     sns_message['bounce']['bounceType'] == 'Transient':
                 for bounced_recipient in \
@@ -76,7 +76,7 @@ def lambda_handler(event, context):
                     email = bounced_recipient['emailAddress']
                     print(
                         f'{email} is a transient bounced email recipient' +
-                        ', not blacklisting'
+                        ', not blocklisting'
                     )
             else:
                 print('No clue what\'s going on right now.....')

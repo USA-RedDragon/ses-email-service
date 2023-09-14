@@ -5,7 +5,7 @@ venv/
 .dockerignore
 .gitignore
 Dockerfile
-email_blacklist.py
+email_blocklist.py
 LICENSE.md
 README.md
 k8s_definitions/

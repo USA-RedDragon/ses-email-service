@@ -27,7 +27,7 @@ spec:
           mountPath: "/ssl"
           readOnly: true
         env:
-        - name: USE_BLACKLIST
+        - name: USE_BLOCKLIST
           value: "true"
         - name: DEBUG
           value: "true"
@@ -42,9 +42,9 @@ spec:
         - name: AWS_SMTP_PORT
           value: "587"
         - name: DYNAMODB_TABLE
-          value: email-blacklist-blacklist
+          value: email-blocklist-blocklist
         - name: DYNAMODB_API_KEYS_TABLE
-          value: email-blacklist-api_keys
+          value: email-blocklist-api_keys
         - name: ENABLE_SSL
           value: "true"
         - name: SERVER_FQDN

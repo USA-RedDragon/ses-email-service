@@ -5,17 +5,17 @@ variable "aws_region" {
 
 variable "lambda_function_name" {
   type    = string
-  default = "email-blacklist"
+  default = "email-blocklist"
 }
 
 variable "ses_identity_arn" {
   type = string
 }
 
-variable "email_blacklist_failure_from_address" {
+variable "email_blocklist_failure_from_address" {
   type = string
 }
 
-variable "email_blacklist_failure_to_address" {
+variable "email_blocklist_failure_to_address" {
   type = string
 }

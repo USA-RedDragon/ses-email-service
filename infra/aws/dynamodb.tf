@@ -1,6 +1,6 @@
 
-resource "aws_dynamodb_table" "email_blacklist" {
-  name           = "${var.lambda_function_name}-blacklist"
+resource "aws_dynamodb_table" "email_blocklist" {
+  name           = "${var.lambda_function_name}-blocklist"
   read_capacity  = 1
   write_capacity = 1
   hash_key       = "email"
@@ -11,7 +11,7 @@ resource "aws_dynamodb_table" "email_blacklist" {
   }
 
   tags = {
-    Name = "${var.lambda_function_name}-blacklist"
+    Name = "${var.lambda_function_name}-blocklist"
   }
 }
 
