@@ -3,7 +3,7 @@ name: Build Email Blacklist Lambda
 on:
   push:
     branches:
-      - master
+      - main
 
 defaults:
   run:
