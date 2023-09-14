@@ -12,6 +12,10 @@ permissions:
   contents: read       # Required for actions/checkout
   pull-requests: write # Required for peter-evans/create-or-update-comment
 
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.ref }}'
+  cancel-in-progress: false
+
 jobs:
   check:
     runs-on: ubuntu-22.04
