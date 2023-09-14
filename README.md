@@ -1,7 +1,5 @@
 # SES Email Service
 
-[![](https://images.microbadger.com/badges/image/jamcswain/ses-email-service.svg)](https://microbadger.com/images/jamcswain/ses-email-service "Get your own image badge on microbadger.com")
-
 [![Blacklist Lambda](https://github.com/USA-RedDragon/ses-email-service/actions/workflows/email-blacklist.yaml/badge.svg?branch=main)](https://github.com/USA-RedDragon/ses-email-service/actions/workflows/email-blacklist.yaml)
 [![Docker Images](https://github.com/USA-RedDragon/ses-email-service/actions/workflows/email-service.yaml/badge.svg?branch=main)](https://github.com/USA-RedDragon/ses-email-service/actions/workflows/email-service.yaml)
 
