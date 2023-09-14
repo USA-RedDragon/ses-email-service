@@ -120,14 +120,15 @@ jobs:
           if ("${{ steps.plan.outcome }}" == "success") {
             comment += `\n#### ✅ Terraform Plan Passed`;
           } else {
-            comment += `\n#### ❌ Terraform Plan Failed
+            comment += `\n#### ❌ Terraform Plan Failed`;
+          }
+          comment += `
           <details>
           <summary><code>terraform plan</code> output</summary>
           <pre>\n
           ${process.env.PLAN}
           </pre>\n
           </details>`;
-          }
 
           return comment;
 
