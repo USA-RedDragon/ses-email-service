@@ -17,8 +17,6 @@ jobs:
         fetch-depth: 0
 
     - uses: hashicorp/setup-terraform@v2
-      with:
-        terraform_version: 0.14.7
 
     - name: Terraform fmt
       id: fmt
