@@ -17,8 +17,7 @@ terraform {
 }
 
 provider "aws" {
-  region  = var.aws_region
-  profile = var.aws_profile
+  region = var.aws_region
 }
 
 resource "aws_cloudwatch_log_group" "email_blacklist" {
