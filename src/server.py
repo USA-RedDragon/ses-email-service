@@ -68,8 +68,11 @@ class EmailRelayServer(smtpd.SMTPServer):
                         f'Peer: {repr(addr)} - TLS: {repr(conn.cipher())}',
                         file=sys.stdout
                     )
-                except ssl.SSLEOFError as e:
+                except (ssl.SSLEOFError, ssl.SSLError) as e:
                     print(f'Peer {repr(addr)} invalidated the SSL protocol, dropping.\n{repr(e)}')
+                    return
+                except Exception as e:
+                    print(f'Peer {repr(addr)} failed to complete the TLS handshake, dropping.\n{repr(e)}')
                     return
             self.channel = SMTPChannel(self, conn, addr)
 
