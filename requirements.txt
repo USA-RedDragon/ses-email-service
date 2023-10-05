@@ -1,6 +1,7 @@
 boto3==1.28.60
 docutils==0.20.1
 jmespath==1.0.1
+pyasyncore==1.0.2
 python-dateutil==2.8.2
 ratelimit==2.2.1
 s3transfer==0.7.0
