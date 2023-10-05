@@ -1,4 +1,4 @@
-boto3==1.28.60
+boto3==1.28.61
 docutils==0.20.1
 jmespath==1.0.1
 pyasyncore==1.0.2
