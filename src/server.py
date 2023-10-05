@@ -74,6 +74,8 @@ class EmailRelayServer(smtpd.SMTPServer):
                 except Exception as e:
                     print(f'Peer {repr(addr)} failed to complete the TLS handshake, dropping.\n{repr(e)}')
                     return
+            else:
+                print(f'Peer: {repr(addr)} - TLS: disabled', file=sys.stdout)
             self.channel = SMTPChannel(self, conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
