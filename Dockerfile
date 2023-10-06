@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 
 COPY src/ ./
 
-ENTRYPOINT [ "python", "-u", "server.py" ]
+ENTRYPOINT [ "python", "-u", "main.py" ]
