@@ -1,4 +1,4 @@
-aiosmtpd==1.4.4
+aiosmtpd==1.4.4.post2
 boto3==1.28.61
 docutils==0.20.1
 jmespath==1.0.1
