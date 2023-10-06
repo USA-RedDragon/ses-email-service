@@ -5,7 +5,7 @@ import os
 SES_RATE_LIMIT = int(os.getenv('SES_RATE_LIMIT', '10'))
 
 # Listener
-SMTP_HOST = os.getenv('SMTP_HOST', '0.0.0.0')
+SMTP_HOST = os.getenv('SMTP_HOST', '')
 SMTP_PORT = int(os.getenv('SMTP_PORT', '465'))
 
 # Endpoint
@@ -15,7 +15,6 @@ AWS_SMTP_USERNAME = os.getenv('AWS_SMTP_USERNAME', '')
 AWS_SMTP_PASSWORD = os.getenv('AWS_SMTP_PASSWORD', '')
 
 # API Key Auth
-USE_APIKEY = os.getenv('USE_APIKEY', 'false').lower() == 'true'
 DYNAMODB_API_KEYS_TABLE = os.getenv('DYNAMODB_API_KEYS_TABLE', '')
 
 # SSL

@@ -49,8 +49,6 @@ spec:
           value: "true"
         - name: SERVER_FQDN
           value: "email.mcswain.dev"
-        - name: USE_APIKEY
-          value: "true"
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
