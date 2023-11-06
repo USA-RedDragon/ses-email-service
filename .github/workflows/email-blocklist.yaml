@@ -13,6 +13,10 @@ permissions:
   id-token: write      # Required for aws-actions/configure-aws-credentials
   contents: read       # Required for actions/checkout
 
+env:
+  # Disable Terraform telemetry
+  CHECKPOINT_DISABLE: "true"
+
 jobs:
   build:
     runs-on: ubuntu-22.04
