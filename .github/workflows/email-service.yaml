@@ -12,6 +12,6 @@ concurrency:
 
 jobs:
   docker:
-    uses: USA-RedDragon/reusable-actions/.github/workflows/docker-ci.yaml@v1.0.1
+    uses: USA-RedDragon/reusable-actions/.github/workflows/docker-ci.yaml@v1.0.3
     with:
       push: ${{ github.event_name != 'pull_request' }}
