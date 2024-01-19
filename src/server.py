@@ -78,6 +78,9 @@ class SMTPHandler:
                     # Filter out blocklisted email addresses
                     rcpt_tos = remove_blocklist(rcpt_tos)
 
+                # Strip SMTPUTF8 from mail_options, if present
+                mail_options = [m for m in mail_options if m != 'SMTPUTF8']
+
                 send_errs = server.sendmail(
                     mail_from,
                     rcpt_tos,
