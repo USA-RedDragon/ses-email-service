@@ -1,3 +1,3 @@
 aiosmtpd==1.4.5
-boto3==1.34.72
+boto3==1.34.73
 ratelimit==2.2.1
