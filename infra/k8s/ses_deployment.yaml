@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: ses-email-service
-        image: jacob.pub/ghcr.io/usa-reddragon/ses-email-service:main@sha256:a5e85b2bea14da9f4349ebacb3c877f1776cb6920c26ca74cb3a21f3155b7d38
+        image: jacob.pub/ghcr.io/usa-reddragon/ses-email-service:main@sha256:16c2cb92179e9708190d7ef631f1b8867115dee26dc80c7aca1e7e0dcee7ef10
         imagePullPolicy: Always
         volumeMounts:
         - name: ssl
